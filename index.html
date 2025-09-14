@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weekly Subscription Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0; padding: 20px;
+    }
+    h1 { text-align: center; }
+    .container {
+      max-width: 850px; margin: auto;
+      background: #fff; padding: 20px;
+      border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    input, select, button {
+      padding: 10px; margin: 5px 0; width: 100%;
+      border-radius: 6px; border: 1px solid #ccc;
+    }
+    button {
+      background: #2563eb; color: #fff; border: none;
+      cursor: pointer; font-size: 1rem;
+    }
+    button:hover { background: #1d4ed8; }
+    table {
+      width: 100%; margin-top: 20px;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px; border: 1px solid #ddd;
+      text-align: center;
+    }
+    th { background: #2563eb; color: #fff; }
+    .expired { background: #ffe5e5; color: #d32f2f; font-weight: bold; }
+    .active { background: #e6ffe6; color: #2e7d32; font-weight: bold; }
+    .btn-small {
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin: 2px;
+    }
+    .btn-delete { background: #e53935; color: #fff; border: none; }
+    .btn-delete:hover { background: #c62828; }
+    .btn-renew { background: #43a047; color: #fff; border: none; }
+    .btn-renew:hover { background: #2e7d32; }
+    #search {
+      width: 100%;
+      padding: 10px;
+      margin: 15px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Weekly Subscription Tracker</h1>
+
+    <input type="tel" id="phone" placeholder="Phone Number">
+    <input type="number" id="amount" placeholder="Amount Paid">
+    <select id="clientType">
+      <option value="Client">Client</option>
+      <option value="Not Mine">Not Mine</option>
+    </select>
+    <button onclick="addSubscription()">Add Subscription</button>
+
+    <input type="text" id="search" placeholder="Search by phone number..." onkeyup="searchSubscriptions()">
+
+    <table id="subTable">
+      <thead>
+        <tr>
+          <th>Phone</th>
+          <th>Amount</th>
+          <th>Client Type</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    let subscriptions = JSON.parse(localStorage.getItem("subscriptions")) || [];
+
+    function saveSubscriptions() {
+      localStorage.setItem("subscriptions", JSON.stringify(subscriptions));
+    }
+
+    function addSubscription() {
+      const phone = document.getElementById("phone").value.trim();
+      const amount = document.getElementById("amount").value.trim();
+      const clientType = document.getElementById("clientType").value;
+
+      if (!phone || !amount) {
+        alert("Please fill in all fields");
+        return;
+      }
+
+      const today = new Date();
+      const expiry = new Date(today);
+      expiry.setDate(today.getDate() + 7);
+
+      const sub = {
+        phone,
+        amount: parseFloat(amount),
+        clientType,
+        start: today.toLocaleDateString(),
+        end: expiry.toLocaleDateString()
+      };
+
+      subscriptions.push(sub);
+      saveSubscriptions();
+      renderTable();
+
+      document.getElementById("phone").value = "";
+      document.getElementById("amount").value = "";
+    }
+
+    function deleteSubscription(index) {
+      if (confirm("Are you sure you want to delete this subscription?")) {
+        subscriptions.splice(index, 1);
+        saveSubscriptions();
+        renderTable();
+      }
+    }
+
+    function renewSubscription(index) {
+      const today = new Date();
+      const expiry = new Date(today);
+      expiry.setDate(today.getDate() + 7);
+
+      subscriptions[index].start = today.toLocaleDateString();
+      subscriptions[index].end = expiry.toLocaleDateString();
+
+      saveSubscriptions();
+      renderTable();
+    }
+
+    function renderTable(filteredList = null) {
+      const tbody = document.querySelector("#subTable tbody");
+      tbody.innerHTML = "";
+
+      const today = new Date();
+      let reminders = [];
+
+      const list = filteredList || subscriptions;
+
+      list.forEach((s, index) => {
+        const endDate = new Date(s.end);
+        let statusClass = "";
+        let statusText = "";
+
+        if (today > endDate) {
+          statusClass = "expired";
+          statusText = "Expired";
+          reminders.push(`⚠️ Subscription expired for ${s.phone} (${s.clientType})`);
+        } else {
+          statusClass = "active";
+          statusText = "Active";
+        }
+
+        const row = `<tr>
+          <td>${s.phone}</td>
+          <td>${s.amount}</td>
+          <td>${s.clientType}</td>
+          <td>${s.start}</td>
+          <td>${s.end}</td>
+          <td class="${statusClass}">${statusText}</td>
+          <td>
+            <button class="btn-small btn-renew" onclick="renewSubscription(${subscriptions.indexOf(s)})">Renew</button>
+            <button class="btn-small btn-delete" onclick="deleteSubscription(${subscriptions.indexOf(s)})">Delete</button>
+          </td>
+        </tr>`;
+        tbody.innerHTML += row;
+      });
+
+      if (!filteredList && reminders.length > 0) {
+        alert(reminders.join("\n"));
+      }
+    }
+
+    function searchSubscriptions() {
+      const query = document.getElementById("search").value.trim();
+      if (!query) {
+        renderTable();
+        return;
+      }
+      const filtered = subscriptions.filter(s => s.phone.includes(query));
+      renderTable(filtered);
+    }
+
+    renderTable();
+  </script>
+</body>
+</html>
