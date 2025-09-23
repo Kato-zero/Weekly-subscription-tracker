@@ -6,68 +6,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
-    h1 { text-align: center; }
+    h1 { text-align: center; color: #2563eb; }
     .container { max-width: 850px; margin: auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-    input, select, button { padding: 10px; margin: 5px 0; width: 100%; border-radius: 6px; border: 1px solid #ccc; }
-    button { background: #2563eb; color: #fff; border: none; cursor: pointer; font-size: 1rem; }
+    input, select, button { padding: 10px; margin: 5px 0; width: 100%; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; }
+    button { background: #2563eb; color: #fff; border: none; cursor: pointer; font-size: 1rem; transition: background 0.2s; }
     button:hover { background: #1d4ed8; }
-    #search { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 6px; }
+    #search { margin: 15px 0; }
     .exp-list { list-style: none; padding: 0; margin: 0; }
-    .exp-item { background: #e6ffe6; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); padding: 0; transition: background 0.2s; }
+    .exp-item { background: #e6ffe6; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); overflow: hidden; transition: background 0.2s; }
     .exp-item.expired { background: #ffe5e5; }
-    .exp-header { cursor: pointer; padding: 15px; font-weight: bold; font-size: 1.1rem; color: #2563eb; display: flex; align-items: center; justify-content: space-between; }
-    .exp-header .status { font-size: 0.95rem; font-weight: normal; padding: 2px 8px; border-radius: 8px; }
-    .exp-header .status.active { background: #e6ffe6; color: #2e7d32; }
-    .exp-header .status.expired { background: #ffe5e5; color: #d32f2f; }
-    .exp-content { display: none; padding: 12px 18px 16px 18px; border-top: 1px solid #ddd; font-size: 0.97rem; background: #fff; border-radius: 0 0 8px 8px; animation: fadeIn 0.2s; }
+    .exp-header { cursor: pointer; padding: 15px; font-weight: bold; font-size: 1.05rem; color: #2563eb; display: flex; align-items: center; justify-content: space-between; }
+    .exp-header .status { font-size: 0.9rem; padding: 2px 8px; border-radius: 8px; }
+    .status.active { background: #c8facc; color: #2e7d32; }
+    .status.expired { background: #ffd4d4; color: #d32f2f; }
+    .exp-content { display: none; padding: 12px 18px 16px; border-top: 1px solid #ddd; font-size: 0.95rem; background: #fff; animation: fadeIn 0.2s; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .btn-small { padding: 5px 10px; border-radius: 4px; font-size: 0.9rem; cursor: pointer; margin: 2px; }
+    .btn-small { padding: 5px 10px; border-radius: 4px; font-size: 0.85rem; cursor: pointer; margin: 2px; }
     .btn-delete { background: #e53935; color: #fff; border: none; }
     .btn-delete:hover { background: #c62828; }
     .btn-renew { background: #43a047; color: #fff; border: none; }
     .btn-renew:hover { background: #2e7d32; }
+    .btn-edit-missing { background: #ff9800; color: #fff; border: none; }
+    .btn-edit-missing:hover { background: #e68900; }
     .deleted-section { margin-top: 40px; background: #fff7e6; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.07); }
     .deleted-title { color: #d32f2f; font-weight: bold; margin-bottom: 10px; }
     .deleted-list .exp-header { color: #d32f2f; }
     .deleted-list .exp-item { background: #fff7e6; }
     /* Modal styles */
     #editModal {
-      display: none; position:fixed; top:0; left:0; width:100vw; height:100vh;
-      background:rgba(0,0,0,0.35); z-index:1000; align-items:center; justify-content:center;
+      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.35); z-index: 1000; align-items: center; justify-content: center;
     }
     #editModal .modal-content {
-      background:#fff; border-radius:10px; max-width:350px; margin:auto; padding:24px 18px;
-      box-shadow:0 4px 12px rgba(0,0,0,0.13); position:relative;
+      background: #fff; border-radius: 10px; max-width: 350px; margin: auto; padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.13);
     }
-    #editModal input, #editModal select, #editModal button {
-      width: 100%;
-      margin-bottom: 8px;
-    }
-    #editModal h2 { margin-top: 0; }
+    #editModal h2 { margin-top: 0; color: #2563eb; }
+    #editModal input, #editModal select, #editModal button { margin-bottom: 8px; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Weekly Subscription Tracker</h1>
 
-    <input type="text" id="name" placeholder="Name">
+    <input type="text" id="name" placeholder="Name (optional)">
     <input type="tel" id="phone" placeholder="Phone Number">
     <input type="number" id="amount" placeholder="Amount Paid">
     <select id="clientType">
       <option value="Client">Client</option>
       <option value="Not Mine">Not Mine</option>
     </select>
-    <input type="date" id="startDate" placeholder="Select start date">
+    <input type="date" id="startDate">
     <button onclick="addSubscription()">Add Subscription</button>
 
     <input type="text" id="search" placeholder="Search by phone number..." onkeyup="searchSubscriptions()">
 
-    <!-- Add the button for re-editing missing name by phone number -->
-    <button onclick="findAndEditMissingName()" style="margin-bottom:12px;width:100%;background:#ff9800;color:#fff;">Re-edit Missing Name by Phone</button>
+    <button onclick="findAndEditMissingName()" class="btn-edit-missing" style="width:100%;margin-bottom:12px;">
+      Re-edit Missing Name by Phone
+    </button>
 
     <ul id="subList" class="exp-list"></ul>
+
     <div class="deleted-section" id="deletedSection" style="display:none;">
-      <div class="deleted-title">Deleted Names (Can be renewed if paid):</div>
+      <div class="deleted-title">Deleted Names (Can be renewed):</div>
       <ul id="deletedList" class="exp-list deleted-list"></ul>
     </div>
   </div>
@@ -75,7 +76,7 @@
   <!-- Edit Modal -->
   <div id="editModal">
     <div class="modal-content">
-      <h2>Edit & Renew Subscription</h2>
+      <h2>Edit & Renew</h2>
       <input type="text" id="editName" placeholder="Name">
       <input type="tel" id="editPhone" placeholder="Phone Number">
       <input type="number" id="editAmount" placeholder="Amount Paid">
@@ -83,17 +84,15 @@
         <option value="Client">Client</option>
         <option value="Not Mine">Not Mine</option>
       </select>
-      <button onclick="confirmEditRenew()" style="width:100%;margin-top:12px;">Save & Renew</button>
-      <button onclick="closeEditModal()" style="width:100%;margin-top:8px;background:#eee;color:#333;">Cancel</button>
+      <button onclick="confirmEditRenew()">Save & Renew</button>
+      <button onclick="closeEditModal()" style="background:#eee;color:#333;">Cancel</button>
     </div>
   </div>
 
   <script>
     let subscriptions = JSON.parse(localStorage.getItem("subscriptions")) || [];
     let deletedSubscriptions = JSON.parse(localStorage.getItem("deletedSubscriptions")) || [];
-
-    let editIndex = null;
-    let editIsDeleted = false;
+    let editIndex = null, editIsDeleted = false;
 
     function saveSubscriptions() {
       localStorage.setItem("subscriptions", JSON.stringify(subscriptions));
@@ -105,30 +104,23 @@
       const phone = document.getElementById("phone").value.trim();
       const amount = document.getElementById("amount").value.trim();
       const clientType = document.getElementById("clientType").value;
-      const startDateInput = document.getElementById("startDate").value;
+      const startDate = document.getElementById("startDate").value;
 
-      if (!phone || !amount || !startDateInput) {
-        alert("Please fill in all fields except name (name can be edited later)");
+      if (!phone || !amount || !startDate) {
+        alert("Phone, amount, and start date are required. Name is optional.");
         return;
       }
 
-      // Dates
-      const start = new Date(startDateInput);
-      const expiry = new Date(start);
-      expiry.setDate(start.getDate() + 7);
+      const start = new Date(startDate);
+      const end = new Date(start);
+      end.setDate(start.getDate() + 7);
 
-      const sub = {
-        name,
-        phone,
-        amount: parseFloat(amount),
-        clientType,
-        start: start.toLocaleDateString(),
-        end: expiry.toLocaleDateString(),
-        startISO: start.toISOString(),
-        endISO: expiry.toISOString()
-      };
+      subscriptions.push({
+        name, phone, amount: parseFloat(amount), clientType,
+        start: start.toLocaleDateString(), end: end.toLocaleDateString(),
+        startISO: start.toISOString(), endISO: end.toISOString()
+      });
 
-      subscriptions.push(sub);
       saveSubscriptions();
       renderList();
 
@@ -140,34 +132,26 @@
 
     function deleteSubscription(index) {
       const sub = subscriptions[index];
-      deletedSubscriptions.push({
-        name: sub.name,
-        phone: sub.phone,
-        clientType: sub.clientType,
-        deletedOn: new Date().toLocaleDateString()
-      });
+      deletedSubscriptions.push({ name: sub.name, phone: sub.phone, clientType: sub.clientType, deletedOn: new Date().toLocaleDateString() });
       subscriptions.splice(index, 1);
       saveSubscriptions();
       renderList();
       renderDeletedList();
     }
 
-    // Modal logic for edit & renew
     function openEditModal(index, isDeleted) {
-      editIndex = index;
-      editIsDeleted = isDeleted;
-      let s = isDeleted ? deletedSubscriptions[index] : subscriptions[index];
+      editIndex = index; editIsDeleted = isDeleted;
+      const s = isDeleted ? deletedSubscriptions[index] : subscriptions[index];
       document.getElementById("editName").value = s.name || "";
       document.getElementById("editPhone").value = s.phone || "";
-      document.getElementById("editAmount").value = isDeleted ? "" : (s.amount !== undefined ? s.amount : "");
+      document.getElementById("editAmount").value = isDeleted ? "" : (s.amount || "");
       document.getElementById("editClientType").value = s.clientType || "Client";
       document.getElementById("editModal").style.display = "flex";
     }
 
     function closeEditModal() {
       document.getElementById("editModal").style.display = "none";
-      editIndex = null;
-      editIsDeleted = false;
+      editIndex = null; editIsDeleted = false;
     }
 
     function confirmEditRenew() {
@@ -175,133 +159,88 @@
       const phone = document.getElementById("editPhone").value.trim();
       const amount = document.getElementById("editAmount").value.trim();
       const clientType = document.getElementById("editClientType").value;
-      const today = new Date();
-      const expiry = new Date(today);
-      expiry.setDate(today.getDate() + 7);
 
-      if (!name || !phone || (!editIsDeleted && !amount)) {
-        alert("Please fill in all fields");
-        return;
-      }
+      if (!phone) { alert("Phone number is required."); return; }
+
+      const today = new Date();
+      const end = new Date(today); end.setDate(today.getDate() + 7);
 
       if (editIsDeleted) {
-        // Renew and edit deleted subscription
         deletedSubscriptions.splice(editIndex, 1);
         subscriptions.push({
-          name,
-          phone,
-          amount: amount ? parseFloat(amount) : 0,
-          clientType,
-          start: today.toLocaleDateString(),
-          end: expiry.toLocaleDateString(),
-          startISO: today.toISOString(),
-          endISO: expiry.toISOString()
+          name, phone, amount: amount ? parseFloat(amount) : 0, clientType,
+          start: today.toLocaleDateString(), end: end.toLocaleDateString(),
+          startISO: today.toISOString(), endISO: end.toISOString()
         });
-        saveSubscriptions();
-        renderList();
         renderDeletedList();
       } else {
-        // Edit and renew active subscription
-        subscriptions[editIndex].name = name;
-        subscriptions[editIndex].phone = phone;
-        subscriptions[editIndex].amount = parseFloat(amount);
-        subscriptions[editIndex].clientType = clientType;
-        subscriptions[editIndex].start = today.toLocaleDateString();
-        subscriptions[editIndex].end = expiry.toLocaleDateString();
-        subscriptions[editIndex].startISO = today.toISOString();
-        subscriptions[editIndex].endISO = expiry.toISOString();
-        saveSubscriptions();
-        renderList();
+        Object.assign(subscriptions[editIndex], {
+          name, phone, amount: parseFloat(amount), clientType,
+          start: today.toLocaleDateString(), end: end.toLocaleDateString(),
+          startISO: today.toISOString(), endISO: end.toISOString()
+        });
       }
+      saveSubscriptions();
+      renderList();
       closeEditModal();
     }
 
-    // Function to re-edit subscriptions with missing names by phone number
     function findAndEditMissingName() {
       const phone = prompt("Enter client's phone number:");
       if (!phone) return;
-
-      const index = subscriptions.findIndex(s => s.phone === phone && (!s.name || s.name.trim() === ""));
-      if (index === -1) {
-        alert("No subscription found with that phone number and missing name.");
-        return;
-      }
-
-      // Open edit modal for missing name
+      const index = subscriptions.findIndex(s => s.phone === phone && !s.name);
+      if (index === -1) { alert("No record found with missing name."); return; }
       openEditModal(index, false);
     }
 
-    // Auto-remove expired subscriptions before rendering
     function autoRemoveExpired() {
-      const today = new Date();
-      let changed = false;
-      subscriptions = subscriptions.filter((sub, index) => {
-        const endDate = new Date(sub.endISO || sub.end);
-        if (today > endDate) {
-          // Move to deleted list
-          deletedSubscriptions.push({
-            name: sub.name,
-            phone: sub.phone,
-            clientType: sub.clientType,
-            deletedOn: today.toLocaleDateString()
-          });
-          changed = true;
-          return false;
+      const today = new Date(); let changed = false;
+      subscriptions = subscriptions.filter(sub => {
+        const end = new Date(sub.endISO || sub.end);
+        if (today > end) {
+          deletedSubscriptions.push({ name: sub.name, phone: sub.phone, clientType: sub.clientType, deletedOn: today.toLocaleDateString() });
+          changed = true; return false;
         }
         return true;
       });
       if (changed) saveSubscriptions();
     }
 
-    function renderList(filteredList = null) {
-      autoRemoveExpired(); // Remove expired before rendering
-
-      const ul = document.getElementById("subList");
-      ul.innerHTML = "";
-
+    function renderList(list = subscriptions) {
+      autoRemoveExpired();
+      const ul = document.getElementById("subList"); ul.innerHTML = "";
       const today = new Date();
-      const list = filteredList || subscriptions;
 
-      list.forEach((s, index) => {
-        const endDate = new Date(s.endISO || s.end);
-        let statusClass = "";
-        let statusText = "";
-
-        if (today > endDate) {
-          statusClass = "expired";
-          statusText = "Expired";
-        } else {
-          statusClass = "active";
-          statusText = "Active";
-        }
+      list.forEach((s, i) => {
+        const end = new Date(s.endISO || s.end);
+        const status = today > end ? "expired" : "active";
+        const statusText = status === "expired" ? "Expired" : "Active";
 
         const li = document.createElement("li");
-        li.className = `exp-item ${statusClass}`;
+        li.className = `exp-item ${status}`;
 
-        // Header
         const header = document.createElement("div");
         header.className = "exp-header";
         header.innerHTML = `
-          <span>${s.name ? s.name : "<em style='color:red;'>Name Missing</em>"}</span>
-          <span class="status ${statusClass}">${statusText}</span>
+          <span>${s.name || "<em style='color:red;'>Name Missing</em>"} 
+            <span style="color:#2563eb;font-size:0.9em;margin-left:8px;">${s.phone}</span>
+          </span>
+          <span class="status ${status}">${statusText}</span>
         `;
-        header.onclick = function() {
-          content.style.display = content.style.display === "block" ? "none" : "block";
-        };
+        header.onclick = () => content.style.display = content.style.display === "block" ? "none" : "block";
 
-        // Content
         const content = document.createElement("div");
         content.className = "exp-content";
         content.innerHTML = `
           <div><strong>Phone:</strong> ${s.phone}</div>
-          <div><strong>Amount:</strong> ${s.amount !== undefined ? s.amount : ""}</div>
+          <div><strong>Amount:</strong> ${s.amount || ""}</div>
           <div><strong>Client Type:</strong> ${s.clientType}</div>
-          <div><strong>Start Date:</strong> ${s.start}</div>
-          <div><strong>End Date:</strong> ${s.end}</div>
-          <div style="margin-top:12px;">
+          <div><strong>Start:</strong> ${s.start}</div>
+          <div><strong>End:</strong> ${s.end}</div>
+          <div style="margin-top:10px;">
             <button class="btn-small btn-renew" onclick="openEditModal(${subscriptions.indexOf(s)}, false)">Renew & Edit</button>
             <button class="btn-small btn-delete" onclick="deleteSubscription(${subscriptions.indexOf(s)})">Delete</button>
-            ${(!s.name || s.name.trim() === "") ? `<button class="btn-small" style="background:#ff9800;color:#fff;" onclick="openEditModal(${subscriptions.indexOf(s)}, false)">Re-edit Name</button>` : ""}
+            ${!s.name ? `<button class="btn-small btn-edit-missing" onclick="openEditModal(${subscriptions.indexOf(s)}, false)">Re-edit Name</button>` : ""}
           </div>
         `;
 
@@ -312,41 +251,34 @@
     }
 
     function renderDeletedList() {
+      const ul = document.getElementById("deletedList"); ul.innerHTML = "";
       const section = document.getElementById("deletedSection");
-      const ul = document.getElementById("deletedList");
-      ul.innerHTML = "";
-
-      if (deletedSubscriptions.length === 0) {
-        section.style.display = "none";
-        return;
-      }
+      if (!deletedSubscriptions.length) { section.style.display = "none"; return; }
       section.style.display = "block";
 
-      deletedSubscriptions.forEach((d, index) => {
+      deletedSubscriptions.forEach((d, i) => {
         const li = document.createElement("li");
         li.className = "exp-item";
 
-        // Header
         const header = document.createElement("div");
         header.className = "exp-header";
         header.innerHTML = `
-          <span>${d.name ? d.name : "<em style='color:red;'>Name Missing</em>"}</span>
+          <span>${d.name || "<em style='color:red;'>Name Missing</em>"} 
+            <span style="color:#2563eb;font-size:0.9em;margin-left:8px;">${d.phone}</span>
+          </span>
           <span class="status expired">Deleted</span>
         `;
-        header.onclick = function() {
-          content.style.display = content.style.display === "block" ? "none" : "block";
-        };
+        header.onclick = () => content.style.display = content.style.display === "block" ? "none" : "block";
 
-        // Content
         const content = document.createElement("div");
         content.className = "exp-content";
         content.innerHTML = `
           <div><strong>Phone:</strong> ${d.phone}</div>
           <div><strong>Client Type:</strong> ${d.clientType}</div>
           <div><strong>Deleted On:</strong> ${d.deletedOn}</div>
-          <div style="margin-top:12px;">
-            <button class="btn-small btn-renew" onclick="openEditModal(${index}, true)">Renew & Edit</button>
-            ${(!d.name || d.name.trim() === "") ? `<button class="btn-small" style="background:#ff9800;color:#fff;" onclick="openEditModal(${index}, true)">Re-edit Name</button>` : ""}
+          <div style="margin-top:10px;">
+            <button class="btn-small btn-renew" onclick="openEditModal(${i}, true)">Renew & Edit</button>
+            ${!d.name ? `<button class="btn-small btn-edit-missing" onclick="openEditModal(${i}, true)">Re-edit Name</button>` : ""}
           </div>
         `;
 
@@ -357,18 +289,11 @@
     }
 
     function searchSubscriptions() {
-      const query = document.getElementById("search").value.trim();
-      if (!query) {
-        renderList();
-        return;
-      }
-      const filtered = subscriptions.filter(s => s.phone.includes(query));
-      renderList(filtered);
+      const q = document.getElementById("search").value.trim();
+      renderList(q ? subscriptions.filter(s => s.phone.includes(q)) : subscriptions);
     }
 
-    // Initial render
-    renderList();
-    renderDeletedList();
+    renderList(); renderDeletedList();
   </script>
 </body>
-  </html>
+</html>
