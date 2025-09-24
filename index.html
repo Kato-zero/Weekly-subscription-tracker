@@ -14,11 +14,11 @@
     #search { margin: 15px 0; }
     .exp-list { list-style: none; padding: 0; margin: 0; }
     .exp-item { background: #e6ffe6; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); overflow: hidden; transition: background 0.2s; }
-    .exp-item.expired { background: #ffe5e5; }
+    .exp-item.inactive { background: #ffe5e5; }
     .exp-header { cursor: pointer; padding: 15px; font-weight: bold; font-size: 1.05rem; color: #2563eb; display: flex; align-items: center; justify-content: space-between; }
     .exp-header .status { font-size: 0.9rem; padding: 2px 8px; border-radius: 8px; }
     .status.active { background: #c8facc; color: #2e7d32; }
-    .status.expired { background: #ffd4d4; color: #d32f2f; }
+    .status.inactive { background: #ffd4d4; color: #d32f2f; }
     .exp-content { display: none; padding: 12px 18px 16px; border-top: 1px solid #ddd; font-size: 0.95rem; background: #fff; animation: fadeIn 0.2s; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .btn-small { padding: 5px 10px; border-radius: 4px; font-size: 0.85rem; cursor: pointer; margin: 2px; }
@@ -170,26 +170,14 @@
       openEditModal(index);
     }
 
-    function autoRemoveExpired() {
-      const today = new Date();
-      let changed = false;
-      subscriptions = subscriptions.filter(sub => {
-        const end = new Date(sub.endISO || sub.end);
-        if (today > end) { changed = true; return false; }
-        return true;
-      });
-      if (changed) saveSubscriptions();
-    }
-
     function renderList(list = subscriptions) {
-      autoRemoveExpired();
       const ul = document.getElementById("subList"); ul.innerHTML = "";
       const today = new Date();
 
       list.forEach((s, i) => {
         const end = new Date(s.endISO || s.end);
-        const status = today > end ? "expired" : "active";
-        const statusText = status === "expired" ? "Expired" : "Active";
+        const status = today > end ? "inactive" : "active";
+        const statusText = status === "inactive" ? "Inactive" : "Active";
 
         const li = document.createElement("li");
         li.className = `exp-item ${status}`;
@@ -232,4 +220,4 @@
     renderList();
   </script>
 </body>
-</html>
+  </html>
